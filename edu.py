@@ -1,8 +1,11 @@
 import openai
 import streamlit as st
 
+<<<<<<< HEAD:edu.py
 # Set up the OpenAI API client
 openai.api_key = "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"
+=======
+>>>>>>> c57c94c (commit):main.py
 
 # Streamlit application
 st.title("🤖EduMinds")
