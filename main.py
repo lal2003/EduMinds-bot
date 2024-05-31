@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import openai
 import streamlit as st
 
@@ -44,3 +45,8 @@ def chat_interface():
 
 if __name__ == "__main__":
     chat_interface()
+=======
+import streamlit as st
+
+st.write('EduMinds')
+>>>>>>> 36ce895 (uploaded)
