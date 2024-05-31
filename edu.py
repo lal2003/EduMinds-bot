@@ -1,51 +1,58 @@
-import openai
+import os
+
 import streamlit as st
+from dotenv import load_dotenv
+import google.generativeai as gen_ai
 
-<<<<<<< HEAD:edu.py
-# Set up the OpenAI API client
-openai.api_key = "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"
-=======
->>>>>>> c57c94c (commit):main.py
 
-# Streamlit application
+# Load environment variables
+load_dotenv()
+
+# Configure Streamlit page settings
+st.set_page_config(
+    page_title="Chat with EduMinds",
+    page_icon=":brain:",  # Favicon emoji
+    layout="centered",  # Page layout option
+)
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+# Set up Google Gemini-Pro AI model
+gen_ai.configure(api_key=GOOGLE_API_KEY)
+model = gen_ai.GenerativeModel('gemini-pro')
+
+
+# Function to translate roles between Gemini-Pro and Streamlit terminology
+def translate_role_for_streamlit(user_role):
+    if user_role == "model":
+        return "assistant"
+    else:
+        return user_role
+
+
+# Initialize chat session in Streamlit if not already present
+if "chat_session" not in st.session_state:
+    st.session_state.chat_session = model.start_chat(history=[])
+
+
+# Display the chatbot's title on the page
 st.title("🤖EduMinds")
 st.title("Your personal assistant")
 
-def chat_with_gpt(prompt):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response['choices'][0]['message']['content'].strip()
+# Display the chat history
+for message in st.session_state.chat_session.history:
+    with st.chat_message(translate_role_for_streamlit(message.role)):
+        st.markdown(message.parts[0].text)
 
-def chat_interface():
-    # Initialize session state if not already done
-    if 'conversations' not in st.session_state:
-        st.session_state.conversations = []
+# Input field for user's message
+user_prompt = st.chat_input("Your Message for EduMinds")
+if user_prompt:
+    # Add user's message to chat and display it
+    st.chat_message("user").markdown(user_prompt)
 
-    # Display conversation history
-    for user_input, response in st.session_state.conversations:
-        st.write(f"🔣user_input: {user_input}")
-        st.write(f"⚙️EduMains: {response}")
-        st.markdown('---')
+    # Send user's message to Gemini-Pro and get the response
+    gemini_response = st.session_state.chat_session.send_message(user_prompt)
 
-    # User input and Send button
-    user_input_key = st.session_state.user_input_count if 'user_input_count' in st.session_state else 0
-    user_input = st.text_input(f"🔣Your message to EduMains:", key=f"user_input_{user_input_key}")
-    send_button = st.button("Send")
-
-    if send_button and user_input:
-        # Get response from GPT-3.5 Turbo
-        response = chat_with_gpt(user_input)
-        
-        # Update conversation history
-        st.session_state.conversations.append((user_input, response))
-        
-        # Clear the input field
-        st.session_state.user_input_count = user_input_key + 1
-        
-        # Rerun the app to update the interface
-        st.experimental_rerun()
-
-if __name__ == "__main__":
-    chat_interface()
+    # Display Gemini-Pro's response
+    with st.chat_message("assistant"):
+        st.markdown(gemini_response.text)
