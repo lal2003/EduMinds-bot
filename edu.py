@@ -38,7 +38,23 @@ if "chat_session" not in st.session_state:
 
 # Display the chatbot's title on the page
 st.title("🤖EduMinds")
+
 st.write("Your personal assistant")
+st.markdown(
+    """
+    <style>
+    .big-font {
+        font-size:24px !important;
+    }
+    </style>
+    """, 
+    unsafe_allow_html=True
+)
+
+st.title("Streamlit Font Size Example")
+
+# Using st.write with custom CSS
+st.markdown('<p class="big-font">This is normal text with increased font size.</p>', unsafe_allow_html=True)
 
 # Display the chat history
 for message in st.session_state.chat_session.history:
